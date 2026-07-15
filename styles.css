@@ -16,6 +16,12 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* Elements are focusable (for D-pad detection), but we draw our own selection
+   highlight — so hide the browser focus ring that shows as a bright frame on the
+   glasses' additive display. */
+#app:focus, .row:focus, .detail:focus, .list:focus,
+#app:focus-visible, .row:focus-visible, .detail:focus-visible { outline: none; }
+
 html, body {
   width: var(--stage);
   height: var(--stage);
@@ -132,9 +138,18 @@ html, body {
   color: var(--fg-dim);
   padding-top: 6px;
 }
+/* Dice-roll animation: dim/flicker while cycling, then a bounce on landing. */
+.roll-total.rolling { opacity: 0.75; }
+.roll-total.landed { animation: land 0.45s ease-out; }
+@keyframes land {
+  0%   { transform: scale(1.6); }
+  55%  { transform: scale(0.9); }
+  100% { transform: scale(1); }
+}
 
 /* Respect reduced-motion preferences (accessibility guideline). */
 @media (prefers-reduced-motion: reduce) {
   .row.selected { box-shadow: none; }
+  .roll-total.landed { animation: none; }
   * { scroll-behavior: auto !important; }
 }

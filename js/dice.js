@@ -35,6 +35,31 @@ window.Dice = (function () {
       s.result = { rolls: rolls, die: die, sum: sum, mod: m, total: sum + m };
     }
 
+    function reducedMotion() {
+      return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    }
+
+    // Fun visual: rapidly cycle the number, then land on the real total with a bounce.
+    function animate() {
+      if (reducedMotion() || !s.result) return;
+      var el = App.el.querySelector("#roll-total");
+      if (!el) return;
+      var maxFace = s.result.die * Math.max(1, s.count);
+      var frames = 14, i = 0;
+      el.classList.add("rolling");
+      var timer = setInterval(function () {
+        i++;
+        el.textContent = String(1 + Math.floor(Math.random() * maxFace));
+        if (i >= frames) {
+          clearInterval(timer);
+          el.textContent = String(s.result.total);
+          el.classList.remove("rolling");
+          el.classList.add("landed");
+          setTimeout(function () { if (el) el.classList.remove("landed"); }, 450);
+        }
+      }, 55);
+    }
+
     function fields() {
       return [
         { label: "Die", value: "d" + DICE[s.dieIdx] },
@@ -56,13 +81,14 @@ window.Dice = (function () {
         if (s.result) {
           var r = s.result;
           html += '<div class="result">';
-          html += '<span class="roll-total">' + r.total + "</span>";
+          html += '<span class="roll-total" id="roll-total">' + r.total + "</span>";
           html += '<div class="roll-detail">' + s.count + "d" + r.die + " [" + r.rolls.join(", ") + "]" +
                   (r.mod ? " " + Store.fmt(r.mod) : "") + " = " + r.total + "</div>";
           html += "</div>";
         }
         App.el.innerHTML = html;
         App.setHint("▲▼ Field   ◀▶ Adjust   ● Roll/Select");
+        UI.scrollSelected();
       },
       onKey: function (dir) {
         var n = 6;
@@ -75,7 +101,7 @@ window.Dice = (function () {
           else if (s.field === 2) s.mod = Math.max(-10, Math.min(20, s.mod + d));
           else if (s.field === 3) s.abilIdx = (s.abilIdx + d + ABILITIES.length) % ABILITIES.length;
         } else if (dir === "select") {
-          if (s.field === 4) { roll(); }
+          if (s.field === 4) { roll(); this.render(); animate(); return; }
           else if (s.field === 5) { App.pop(); return; }
         }
         this.render();

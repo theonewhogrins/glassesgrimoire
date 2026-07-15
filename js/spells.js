@@ -196,6 +196,7 @@ window.Spells = (function () {
           [{ main: "Max slots", meta: String(s.max) },
            { main: "Used", meta: String(s.used) }], field);
         App.setHint("▲▼ Field   ◀▶ Adjust   ● Done");
+        UI.scrollSelected();
       },
       onKey: function (dir) {
         var s = Store.slotFor(level);

@@ -36,7 +36,14 @@ window.UI = (function () {
     return html;
   }
 
-  return { esc: esc, listHTML: listHTML };
+  // Scroll the currently-selected row into view (used by list + editor screens).
+  function scrollSelected() {
+    var app = document.getElementById("app");
+    var sel = app && app.querySelector(".row.selected");
+    if (sel && sel.scrollIntoView) sel.scrollIntoView({ block: "nearest" });
+  }
+
+  return { esc: esc, listHTML: listHTML, scrollSelected: scrollSelected };
 })();
 
 // ---- App: the screen stack + input dispatch --------------------------------

@@ -70,6 +70,7 @@ window.Combat = (function () {
         ];
         App.el.innerHTML = UI.listHTML("Add combatant", "◀▶ to change", rows, field);
         App.setHint("▲▼ Field   ◀▶ Adjust   ● Select");
+        UI.scrollSelected();
       },
       onKey: function (dir) {
         if (dir === "up") field = (field + 3) % 4;

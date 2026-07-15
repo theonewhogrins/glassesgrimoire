@@ -72,6 +72,7 @@ window.Character = (function () {
         var rows = f.map(function (x) { return { main: x.label, meta: String(x.get()) }; });
         App.el.innerHTML = UI.listHTML("Edit character", "Save DC " + Store.spellSaveDC(), rows, field);
         App.setHint("▲▼ Field   ◀▶ Adjust   ● Save");
+        UI.scrollSelected();
       },
       onKey: function (dir) {
         var f = fields();
