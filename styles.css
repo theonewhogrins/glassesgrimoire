@@ -1,0 +1,140 @@
+/*
+ * Styling for the Meta Ray-Ban Display (MRBD) additive optics.
+ * KEY RULE: black renders as transparent on the glasses, so we NEVER rely on
+ * dark fills for legibility. Everything readable is light/high-contrast text
+ * or a bright outline. Selected items glow; unselected are dimmer but legible.
+ */
+
+:root {
+  --stage: 600px;          /* physical display */
+  --safe: 550px;           /* safe area — keep all content inside this */
+  --fg: #ffffff;           /* primary text (bright) */
+  --fg-dim: #b8c0d0;       /* secondary text */
+  --accent: #7ce7ff;       /* selection highlight (cyan reads well on optics) */
+  --accent-soft: rgba(124, 231, 255, 0.18);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: var(--stage);
+  height: var(--stage);
+  background: #000;        /* becomes transparent on-device */
+  color: var(--fg);
+  font-family: -apple-system, "Segoe UI", Roboto, system-ui, sans-serif;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  position: absolute;
+  top: 25px; left: 25px;   /* center the 550 safe area in the 600 stage */
+  width: var(--safe);
+  height: 500px;           /* leaves room for the footer hint */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- Screen header ---- */
+.screen-title {
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--fg);
+  padding-bottom: 4px;
+}
+.screen-sub {
+  font-size: 20px;
+  color: var(--fg-dim);
+  padding-bottom: 12px;
+}
+
+/* ---- Scrollable list ---- */
+.list {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;              /* hide scrollbar (Firefox) */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.list::-webkit-scrollbar { display: none; }  /* hide scrollbar (WebKit) */
+
+.row {
+  min-height: 60px;                    /* generous tap/focus target */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 16px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  font-size: 24px;
+  color: var(--fg-dim);
+}
+.row .row-main { font-weight: 600; color: var(--fg); }
+.row .row-meta { font-size: 18px; color: var(--fg-dim); white-space: nowrap; }
+
+/* Selected row: bright outline + soft glow. Visible focus is required — there
+   is no cursor on the glasses, only the D-pad. */
+.row.selected {
+  border-color: var(--accent);
+  color: var(--fg);
+  box-shadow: 0 0 14px var(--accent-soft);
+}
+.row.selected .row-meta { color: var(--accent); }
+
+/* ---- Spell detail ---- */
+.detail {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.detail::-webkit-scrollbar { display: none; }
+.detail h1 { font-size: 30px; margin-bottom: 6px; }
+.detail .school { font-size: 20px; color: var(--accent); margin-bottom: 14px; }
+.detail dl { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; margin-bottom: 14px; }
+.detail dt { font-size: 18px; color: var(--fg-dim); }
+.detail dd { font-size: 18px; color: var(--fg); }
+.detail .desc { font-size: 21px; line-height: 1.35; color: var(--fg); }
+
+/* ---- Footer D-pad hint ---- */
+#hint {
+  position: absolute;
+  bottom: 18px; left: 25px;
+  width: var(--safe);
+  text-align: center;
+  font-size: 16px;
+  color: var(--fg-dim);
+}
+
+/* ---- Shared: notes, values, roll results ---- */
+.note {
+  font-size: 22px;
+  line-height: 1.4;
+  color: var(--fg-dim);
+  padding-top: 8px;
+}
+.result {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(184, 192, 208, 0.25);
+  text-align: center;
+}
+.roll-total {
+  display: block;
+  font-size: 64px;
+  font-weight: 800;
+  color: var(--accent);
+  line-height: 1;
+}
+.roll-detail {
+  font-size: 18px;
+  color: var(--fg-dim);
+  padding-top: 6px;
+}
+
+/* Respect reduced-motion preferences (accessibility guideline). */
+@media (prefers-reduced-motion: reduce) {
+  .row.selected { box-shadow: none; }
+  * { scroll-behavior: auto !important; }
+}
