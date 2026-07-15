@@ -1,7 +1,7 @@
 # Grimoire — D&D Companion for Meta Ray-Ban Display
 
 A glanceable, D-pad-navigable **D&D companion** for the tabletop, built as a
-standalone web app for the **Meta Ray-Ban Display (MRBD)**. Started
+standalone web app for the **Meta Ray-Ban Display (MRBD / Hypernova)**. Started
 as a spellbook; now a modular companion covering spells, character modifiers,
 combat order, and dice.
 

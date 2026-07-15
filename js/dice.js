@@ -32,29 +32,45 @@ window.Dice = (function () {
       for (var i = 0; i < s.count; i++) rolls.push(1 + Math.floor(Math.random() * die));
       var sum = rolls.reduce(function (a, b) { return a + b; }, 0);
       var m = totalMod();
-      s.result = { rolls: rolls, die: die, sum: sum, mod: m, total: sum + m };
+      var single = (die === 20 && s.count === 1); // nat 20 / nat 1 only on a single d20
+      s.result = {
+        rolls: rolls, die: die, sum: sum, mod: m, total: sum + m,
+        crit: single && rolls[0] === 20,
+        fumble: single && rolls[0] === 1
+      };
     }
 
     function reducedMotion() {
       return window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     }
 
-    // Fun visual: rapidly cycle the number, then land on the real total with a bounce.
+    // Fun visual: a tumbling die + rapidly cycling number, then land on the real
+    // total with a bounce (and a color flash on a nat 20 / nat 1).
+    var FACES = ["⚀", "⚁", "⚂", "⚃", "⚄", "⚅"]; // ⚀..⚅
     function animate() {
       if (reducedMotion() || !s.result) return;
       var el = App.el.querySelector("#roll-total");
+      var die = App.el.querySelector("#roll-die");
+      var res = App.el.querySelector(".result");
       if (!el) return;
       var maxFace = s.result.die * Math.max(1, s.count);
       var frames = 14, i = 0;
       el.classList.add("rolling");
+      if (die) die.classList.add("spin");
       var timer = setInterval(function () {
         i++;
         el.textContent = String(1 + Math.floor(Math.random() * maxFace));
+        if (die) die.textContent = FACES[Math.floor(Math.random() * 6)];
         if (i >= frames) {
           clearInterval(timer);
           el.textContent = String(s.result.total);
           el.classList.remove("rolling");
           el.classList.add("landed");
+          if (die) { die.classList.remove("spin"); die.textContent = "⚄"; }
+          if (res && (s.result.crit || s.result.fumble)) {
+            res.classList.add("flash");
+            setTimeout(function () { if (res) res.classList.remove("flash"); }, 550);
+          }
           setTimeout(function () { if (el) el.classList.remove("landed"); }, 450);
         }
       }, 55);
@@ -80,8 +96,12 @@ window.Dice = (function () {
         var html = UI.listHTML("Dice", sub, rows, s.field);
         if (s.result) {
           var r = s.result;
-          html += '<div class="result">';
+          var kls = r.crit ? " crit" : (r.fumble ? " fumble" : "");
+          html += '<div class="result' + kls + '">';
+          html += '<div class="roll-die" id="roll-die">⚄</div>';
           html += '<span class="roll-total" id="roll-total">' + r.total + "</span>";
+          if (r.crit) html += '<div class="roll-flag">NAT 20 — CRIT!</div>';
+          else if (r.fumble) html += '<div class="roll-flag">NAT 1 — FUMBLE!</div>';
           html += '<div class="roll-detail">' + s.count + "d" + r.die + " [" + r.rolls.join(", ") + "]" +
                   (r.mod ? " " + Store.fmt(r.mod) : "") + " = " + r.total + "</div>";
           html += "</div>";

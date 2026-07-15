@@ -113,6 +113,21 @@ html, body {
   color: var(--fg-dim);
 }
 
+/* ---- Home HUD: glanceable stat banner ---- */
+.hud {
+  margin: 8px 0 14px;
+  padding: 10px 0;
+  border-top: 1px solid rgba(184, 192, 208, 0.25);
+  border-bottom: 1px solid rgba(184, 192, 208, 0.25);
+}
+.hud-hp { font-size: 30px; font-weight: 700; color: var(--fg); text-align: center; }
+.hud-hp b { color: var(--accent); font-size: 34px; }
+.hud-hp.low b { color: #ff8a8a; }
+.hud-grid { display: flex; justify-content: space-around; padding-top: 8px; }
+.hud-cell { text-align: center; }
+.hud-k { font-size: 14px; letter-spacing: 1px; color: var(--fg-dim); }
+.hud-v { font-size: 24px; font-weight: 700; color: var(--fg); }
+
 /* ---- Shared: notes, values, roll results ---- */
 .note {
   font-size: 22px;
@@ -138,7 +153,11 @@ html, body {
   color: var(--fg-dim);
   padding-top: 6px;
 }
-/* Dice-roll animation: dim/flicker while cycling, then a bounce on landing. */
+/* Dice-roll animation: tumbling die + cycling number, bounce + flash on landing. */
+.roll-die { font-size: 46px; line-height: 1; color: var(--accent); }
+.roll-die.spin { animation: spin 0.55s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
 .roll-total.rolling { opacity: 0.75; }
 .roll-total.landed { animation: land 0.45s ease-out; }
 @keyframes land {
@@ -147,9 +166,55 @@ html, body {
   100% { transform: scale(1); }
 }
 
+/* Nat 20 / Nat 1 flair */
+.roll-flag { font-size: 24px; font-weight: 800; letter-spacing: 1px; padding-top: 4px; }
+.result.crit .roll-total, .result.crit .roll-flag,
+.result.crit .roll-die { color: #8fe39a; }               /* green */
+.result.fumble .roll-total, .result.fumble .roll-flag,
+.result.fumble .roll-die { color: #ff8a8a; }             /* red */
+.result.crit.flash { animation: flashGreen 0.55s ease-out; }
+.result.fumble.flash { animation: flashRed 0.55s ease-out; }
+@keyframes flashGreen { 0% { box-shadow: inset 0 0 70px rgba(143, 227, 154, 0.65); } 100% { box-shadow: none; } }
+@keyframes flashRed { 0% { box-shadow: inset 0 0 70px rgba(255, 138, 138, 0.65); } 100% { box-shadow: none; } }
+
+/* Name editor (D-pad initials entry) */
+.ne { font-size: 42px; letter-spacing: 4px; padding: 18px 0; word-break: break-word; }
+.ne-slot { padding: 0 2px; color: var(--fg-dim); }
+.ne-cur { color: var(--accent); text-decoration: underline; }
+
+/* Text input + buttons (name entry, etc.) */
+.text-input {
+  width: 100%;
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--fg);
+  font-size: 28px;
+  padding: 12px 14px;
+  margin: 6px 0 12px;
+  font-family: inherit;
+}
+.btn {
+  display: block;
+  width: 100%;
+  text-align: center;
+  padding: 12px 16px;
+  margin: 6px 0;
+  min-height: 48px;
+  border: 2px solid var(--accent);
+  border-radius: 12px;
+  background: transparent;
+  color: var(--fg);
+  font-size: 22px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn:hover, .btn:focus { box-shadow: 0 0 14px var(--accent-soft); outline: none; }
+
 /* Respect reduced-motion preferences (accessibility guideline). */
 @media (prefers-reduced-motion: reduce) {
   .row.selected { box-shadow: none; }
-  .roll-total.landed { animation: none; }
+  .roll-total.landed, .roll-die.spin,
+  .result.crit.flash, .result.fumble.flash { animation: none; }
   * { scroll-behavior: auto !important; }
 }

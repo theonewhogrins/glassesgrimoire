@@ -179,8 +179,10 @@ window.Spells = (function () {
             onSelect: (function (L) { return function () { App.push(slotEditor(L)); }; })(lvl)
           });
         }
-        rows.push({ main: "Long rest (reset used)", onSelect: function () {
-          for (var L = 1; L <= 9; L++) Store.slotFor(L).used = 0; Store.save(); App.render();
+        rows.push({ main: "Long rest (slots + HP)", onSelect: function () {
+          for (var L = 1; L <= 9; L++) Store.slotFor(L).used = 0;
+          var c = Store.character(); if (c.hp) c.hp.cur = c.hp.max;
+          Store.save(); App.render();
         } });
         return rows;
       }
