@@ -118,21 +118,31 @@ window.Character = (function () {
       render: function () {
         App.el.innerHTML =
           '<div class="screen-title">Name</div>' +
-          '<div class="screen-sub">Type a name, then Save</div>' +
+          '<div class="screen-sub">Dictate, write, or type</div>' +
           '<input id="name-input" class="text-input" type="text" maxlength="24" value="' + UI.esc(c.name) + '" />' +
-          '<button id="name-save" class="btn">✓ Save</button>' +
+          '<button id="name-clear" class="btn">▲ Clear</button>' +
+          '<button id="name-save" class="btn">▼ Save</button>' +
           '<button id="name-speller" class="btn">A·B·C  D-pad speller</button>' +
-          '<div class="note">On the glasses, tap the field to use handwriting or voice if enabled — otherwise use the D-pad speller.</div>';
-        App.setHint("Type · Enter = Save · Esc = Back");
+          '<div class="note">Swipe ▲ to clear · swipe ▼ or click to save · swipe ◀ (at start) to go back.</div>';
+        App.setHint("▲ Clear   ▼ Save   ● Save");
         var inp = document.getElementById("name-input");
         if (inp) {
           inp.focus();
-          try { inp.setSelectionRange(inp.value.length, inp.value.length); } catch (e) {}
+          try { inp.select(); } catch (e) {} // pre-select so typing/dictation overwrites
           inp.addEventListener("keydown", function (e) {
-            if (e.key === "Enter") { e.preventDefault(); save(inp.value); }
+            // Single-line field: Up/Down are free, so use them for Clear/Save.
+            // Left/Right still move the cursor; Left at the start goes back.
+            if (e.key === "Enter" || e.key === "ArrowDown") { e.preventDefault(); save(inp.value); }
+            else if (e.key === "ArrowUp") { e.preventDefault(); inp.value = ""; }
             else if (e.key === "Escape") { e.preventDefault(); App.pop(); }
+            else if (e.key === "ArrowLeft" && inp.selectionStart === 0 && inp.selectionEnd === 0) { e.preventDefault(); App.pop(); }
           });
         }
+        var cl = document.getElementById("name-clear");
+        if (cl) cl.addEventListener("click", function () {
+          var i = document.getElementById("name-input");
+          if (i) { i.value = ""; i.focus(); }
+        });
         var sv = document.getElementById("name-save");
         if (sv) sv.addEventListener("click", function () { save(document.getElementById("name-input").value); });
         var sp = document.getElementById("name-speller");
